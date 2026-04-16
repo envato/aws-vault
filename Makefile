@@ -1,16 +1,17 @@
 VERSION=$(shell git describe --tags --candidates=1 --dirty)+envato
-BUILD_FLAGS=-ldflags="-s -w -X main.Version=$(VERSION)" -trimpath
+GO_ARGS=
+BUILD_FLAGS=$(GO_ARGS) -ldflags="-s -w -X main.Version=$(VERSION)" -trimpath
 SRC=$(shell find . -name '*.go') go.mod
 INSTALL_DIR ?= ~/bin
 .PHONY: binaries clean release install snapshot run
 
 ifeq ($(shell uname), Darwin)
 aws-vault: $(SRC)
-	go build -ldflags="-s -w -X main.Version=$(VERSION)" -o $@ .
+	go build $(GO_ARGS) -ldflags="-s -w -X main.Version=$(VERSION)" -o $@ .
 	codesign --options runtime --timestamp --sign - $@
 else
 aws-vault: $(SRC)
-	go build -ldflags="-s -w -X main.Version=$(VERSION)" -o $@ .
+	go build $(GO_ARGS) -ldflags="-s -w -X main.Version=$(VERSION)" -o $@ .
 endif
 
 install: aws-vault
